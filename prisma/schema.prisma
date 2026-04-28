@@ -8,19 +8,20 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  name      String
-  username  String
-  email     String   @unique
-  password  String
-  photo     String?  @default("https://i.pinimg.com/736x/13/74/20/137420f5b9c39bc911e472f5d20f053e.jpg")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String      @id @default(cuid())
+  name       String
+  username   String
+  email      String      @unique
+  password   String
+  photo      String?     @default("https://i.pinimg.com/736x/13/74/20/137420f5b9c39bc911e472f5d20f053e.jpg")
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  playerWars PlayerWar[]
 }
 
 model War {
   id        String      @id @default(cuid())
-  roomId    String      @unique
+  roomId    String
   startedAt String
   status    String
   players   PlayerWar[]
@@ -28,13 +29,22 @@ model War {
 }
 
 model PlayerWar {
-  id                String  @id @default(cuid())
-  userId            String
-  warId             String
-  totalKeystrokes   Int
-  correctKeystrokes Int
-  finished          Boolean @default(false)
-  finishedAt        String
+  id         String @id @default(cuid())
+  warId      String
+  userId     String
+  roomId     String
+  wpm        Int
+  accuracy   Int
+  error      Int
+  progress   Int
+  finishedAt String
 
-  war War @relation(fields: [warId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  rank     Int?
+  isWinner Boolean @default(false)
+
+  war  War  @relation(fields: [warId], references: [id])
+  user User @relation(fields: [userId], references: [id])
 }
