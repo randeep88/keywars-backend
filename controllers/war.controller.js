@@ -3,8 +3,6 @@ import { prisma } from "../lib/prisma.js";
 export const getWarByRoomId = async (req, res) => {
   const { roomId } = req.params;
 
-  console.log(roomId, "in war");
-
   try {
     const war = await prisma.war.findFirst({
       where: {
@@ -28,8 +26,6 @@ export const getWarByRoomId = async (req, res) => {
         },
       },
     });
-
-    console.log(war, "in war");
 
     if (!war) {
       return res.status(404).json({ success: false, message: "War not found" });

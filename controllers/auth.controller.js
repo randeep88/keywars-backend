@@ -5,7 +5,10 @@ export const signup = async (req, res) => {
   try {
     const { name, username, email, password, photo } = req.body;
 
-    console.log(req.body);
+    const generateUniqueAvatar = () => {
+      const seed = username;
+      return `https://api.dicebear.com/9.x/glass/svg?seed=${seed}`;
+    };
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -15,16 +18,20 @@ export const signup = async (req, res) => {
         username,
         email,
         password: hashedPassword,
-        photo,
+        photo: photo || generateUniqueAvatar(),
       },
     });
 
-    console.log("user", user);
-
-    res.json({ message: "user created successfully", data: user });
+    res.json({
+      message: "SignUp successful",
+      data: user,
+      success: true,
+    });
   } catch (error) {
     console.log("error", error);
-    res.status(500).json({ message: "Internal server error", error });
+    res
+      .status(500)
+      .json({ message: "Internal server error", error, success: false });
   }
 };
 
@@ -53,4 +60,3 @@ export const login = async (req, res) => {
     res.status(500).json({ message: "Internal server error", error });
   }
 };
-

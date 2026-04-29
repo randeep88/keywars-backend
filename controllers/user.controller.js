@@ -1,3 +1,4 @@
+import { imagekit } from "../lib/imagekit.js";
 import { prisma } from "../lib/prisma.js";
 
 export const getUserById = async (req, res) => {
@@ -20,7 +21,6 @@ export const getUserById = async (req, res) => {
 export const getUserByEmail = async (req, res) => {
   try {
     const { email } = req.params;
-    console.log("email", email);
 
     const user = await prisma.user.findUnique({
       where: {
@@ -38,23 +38,23 @@ export const getUserByEmail = async (req, res) => {
 export const updateUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, email, username, photo } = req.body;
 
-    const user = await prisma.user.update({
-      where: {
-        id,
-      },
-      data: {
-        name,
-        email,
-        photo,
-        username,
-      },
+    const result = await imagekit.upload({
+      file: req.file.buffer.toString("base64"),
+      fileName: `avatar_${id}`,
+      folder: "/typewars/avatars",
     });
 
-    res.json({ message: "user updated successfully", data: user });
+    const user = await prisma.user.update({
+      where: { id },
+      data: { photo: result.url },
+    });
+
+    res.json({ message: "User photo updated", data: user, success: true });
   } catch (error) {
     console.log("error", error);
-    res.status(500).json({ message: "Internal server error", error });
+    res
+      .status(500)
+      .json({ message: "Internal server error", error, success: false });
   }
 };

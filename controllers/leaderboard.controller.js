@@ -1,6 +1,5 @@
 import { prisma } from "../lib/prisma.js";
 
-// GET /api/leaderboard/global
 export const getGlobalLeaderboard = async (req, res) => {
   try {
     const users = await prisma.user.findMany({
@@ -46,7 +45,6 @@ export const getGlobalLeaderboard = async (req, res) => {
         };
       })
       .sort((a, b) => {
-        // priority: bestWpm > wins > avgWpm
         if (b.bestWpm !== a.bestWpm) {
           return b.bestWpm - a.bestWpm;
         }
