@@ -8,16 +8,19 @@ import leaderboardRouter from "./routes/leaderboard.route.js";
 import { redis } from "./lib/redis.js";
 import { prisma } from "./lib/prisma.js";
 import warRouter from "./routes/war.route.js";
+import cookieParser from "cookie-parser";
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 
 const httpServer = createServer(app);
 
 const io = new Server(httpServer, {
   cors: {
     origin: "*",
+    credentials: true,
   },
 });
 
@@ -233,12 +236,12 @@ io.on("connection", (socket) => {
           return Number(b.accuracy) - Number(a.accuracy);
         }
 
-        // 4. Errors (lower better)
+        // 4. Errors
         if (Number(a.error) !== Number(b.error)) {
           return Number(a.error) - Number(b.error);
         }
 
-        // 5. FinishedAt (earlier better)
+        // 5. FinishedAt
         return Number(a.finishedAt) - Number(b.finishedAt);
       })
       .map((player, index) => ({
