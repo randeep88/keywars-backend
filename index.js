@@ -11,9 +11,13 @@ import warRouter from "./routes/war.route.js";
 import cookieParser from "cookie-parser";
 
 const app = express();
-app.use(cors());
-app.use(express.json());
-app.use(cookieParser());
+
+app.use(
+  cors({
+    origin: "https://keystroq.vercel.app",
+    credentials: true,
+  }),
+);
 
 const httpServer = createServer(app);
 
@@ -23,6 +27,9 @@ const io = new Server(httpServer, {
     credentials: true,
   },
 });
+
+app.use(express.json());
+app.use(cookieParser());
 
 const connectedUsers = new Map();
 const roomHosts = new Map();
