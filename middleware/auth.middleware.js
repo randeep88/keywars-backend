@@ -1,22 +1,18 @@
-import jwt from "jsonwebtoken";
+import { decode } from "@auth/core/jwt";
 
-export const authMiddleware = (req, res, next) => {
-  const token = req.cookies.token;
+export const authMiddleware = async (req, res, next) => {
+  const token = req.cookies["__Secure-authjs.session-token"];
 
-  if (!token) {
-    return res.status(401).json({
-      message: "Unauthorized",
-    });
-  }
+  if (!token) return res.status(401).json({ error: "Unauthorized" });
 
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  const decoded = await decode({
+    token,
+    secret: process.env.BETTER_AUTH_SECRET,
+    salt: "__Secure-authjs.session-token",
+  });
 
-    req.user = decoded;
-    next();
-  } catch (error) {
-    return res.status(401).json({
-      message: "Invalid token",
-    });
-  }
+  if (!decoded) return res.status(401).json({ error: "Invalid token" });
+
+  req.user = decoded;
+  next();
 };
