@@ -7,6 +7,6 @@ import { authMiddleware } from "../middleware/auth.middleware.js";
 const leaderboardRouter = express.Router();
 
 leaderboardRouter.get("/global", authMiddleware, getGlobalLeaderboard);
-leaderboardRouter.get("/home-stats", authMiddleware, getHomeStats);
+leaderboardRouter.get("/home-stats", getHomeStats);
 
 export default leaderboardRouter;
