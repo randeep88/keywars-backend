@@ -189,27 +189,33 @@ io.on("connection", (socket) => {
       },
     });
 
+    const getScore = (p) => {
+      const accuracy = Number(p.accuracy);
+      const wpm = Number(p.wpm);
+      const errors = Number(p.error);
+      const timeTaken = Number(p.finishedAt) - Number(arena.startedAt);
+      const effectiveWpm = wpm * (accuracy / 100);
+      return { effectiveWpm, accuracy, errors, timeTaken };
+    };
+
     const rankedPlayers = [...finishDataAll]
       .filter((d) => d && d.userId)
       .sort((a, b) => {
-        // 1. Progress (zyada better)
-        if (Number(b.progress) !== Number(a.progress)) {
-          return Number(b.progress) - Number(a.progress);
-        }
-        // 2. WPM (zyada better)
-        if (Number(b.wpm) !== Number(a.wpm)) {
-          return Number(b.wpm) - Number(a.wpm);
-        }
-        // 3. Accuracy (zyada better)
-        if (Number(b.accuracy) !== Number(a.accuracy)) {
-          return Number(b.accuracy) - Number(a.accuracy);
-        }
-        // 4. Errors (kam better)
-        if (Number(a.error) !== Number(b.error)) {
-          return Number(a.error) - Number(b.error);
-        }
-        // 5. FinishedAt (pehle finish kiya better)
-        return Number(a.finishedAt) - Number(b.finishedAt);
+        const sa = getScore(a);
+        const sb = getScore(b);
+
+        // 1. Effective WPM (wpm * accuracy) — main criteria
+        if (sb.effectiveWpm !== sa.effectiveWpm)
+          return sb.effectiveWpm - sa.effectiveWpm;
+
+        // 2. Raw accuracy
+        if (sb.accuracy !== sa.accuracy) return sb.accuracy - sa.accuracy;
+
+        // 3. Errors (kam better)
+        if (sa.errors !== sb.errors) return sa.errors - sb.errors;
+
+        // 4. Time taken (kam better)
+        return sa.timeTaken - sb.timeTaken;
       })
       .map((player, index) => ({
         ...player,
@@ -217,7 +223,6 @@ io.on("connection", (socket) => {
         isWinner: index === 0,
       }));
 
-    // winner seedha rankedPlayers[0] se — alag reduce nahi
     const winner = rankedPlayers[0];
 
     await prisma.playerWar.createMany({
