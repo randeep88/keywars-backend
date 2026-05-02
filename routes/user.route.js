@@ -1,21 +1,23 @@
-import expres from "express";
+import express from "express";
 import {
   getUserByEmail,
   getUserById,
-  updateUser,
+  syncUser,
+  updateImageUrl,
 } from "../controllers/user.controller.js";
-import { authMiddleware } from "../middleware/auth.middleware.js";
-const userRouter = expres.Router();
+const userRouter = express.Router();
 import multer from "multer";
 const upload = multer({ storage: multer.memoryStorage() });
+import { checkAuth } from "../middlewares/auth.middleware.js";
 
-userRouter.get("/get-by-id/:id", authMiddleware, getUserById);
-userRouter.get("/get-by-email/:email", authMiddleware, getUserByEmail);
+userRouter.get("/get-by-id/:id", checkAuth, getUserById);
+userRouter.get("/get-by-email/:email", checkAuth, getUserByEmail);
+userRouter.put("/sync", checkAuth, syncUser);
 userRouter.put(
   "/update-photo/:id",
-  authMiddleware,
+  checkAuth,
   upload.single("photo"),
-  updateUser,
+  updateImageUrl,
 );
 
 export default userRouter;

@@ -9,13 +9,15 @@ datasource db {
 
 model User {
   id         String      @id @default(cuid())
-  name       String
-  username   String
+  clerkId    String      @unique
+  fullName   String
+  firstName  String
+  lastName   String
+  username   String      @unique
   email      String      @unique
-  password   String
-  photo      String?
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
+  imageUrl   String
+  createdAt  String
+  updatedAt  String
   playerWars PlayerWar[]
 }
 

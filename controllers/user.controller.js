@@ -35,7 +35,7 @@ export const getUserByEmail = async (req, res) => {
   }
 };
 
-export const updateUser = async (req, res) => {
+export const updateImageUrl = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -47,7 +47,7 @@ export const updateUser = async (req, res) => {
 
     const user = await prisma.user.update({
       where: { id },
-      data: { photo: result.url },
+      data: { imageUrl: result.url },
     });
 
     res.json({ message: "User photo updated", data: user, success: true });
@@ -56,5 +56,73 @@ export const updateUser = async (req, res) => {
     res
       .status(500)
       .json({ message: "Internal server error", error, success: false });
+  }
+};
+
+export const syncUser = async (req, res) => {
+  try {
+    const {
+      fullName,
+      firstName,
+      lastName,
+      email,
+      username,
+      imageUrl,
+      createdAt,
+      updatedAt,
+    } = req.body;
+
+    const clerkId = req.auth?.userId;
+
+    if (!clerkId) {
+      return res.status(401).json({
+        message: "Unauthorized",
+        success: false,
+      });
+    }
+
+    if (!email || !username) {
+      return res.status(400).json({
+        message: "Email and username required",
+        success: false,
+      });
+    }
+
+    const user = await prisma.user.upsert({
+      where: { clerkId },
+      update: {
+        fullName,
+        firstName,
+        lastName,
+        email,
+        username,
+        imageUrl,
+        updatedAt,
+      },
+      create: {
+        clerkId,
+        fullName,
+        firstName,
+        lastName,
+        email,
+        username,
+        imageUrl,
+        createdAt,
+        updatedAt,
+      },
+    });
+
+    res.json({
+      message: "User synced successfully",
+      data: user,
+      success: true,
+    });
+  } catch (error) {
+    console.log("error", error);
+
+    res.status(500).json({
+      message: "Internal server error",
+      success: false,
+    });
   }
 };

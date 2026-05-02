@@ -14,10 +14,10 @@ export const getWarByRoomId = async (req, res) => {
             user: {
               select: {
                 id: true,
-                name: true,
+                fullName: true,
                 username: true,
                 email: true,
-                photo: true,
+                imageUrl: true,
                 createdAt: true,
                 updatedAt: true,
               },
@@ -50,10 +50,10 @@ export const getRecentWars = async (req, res) => {
             user: {
               select: {
                 id: true,
-                name: true,
+                fullName: true,
                 username: true,
                 email: true,
-                photo: true,
+                imageUrl: true,
                 createdAt: true,
                 updatedAt: true,
               },

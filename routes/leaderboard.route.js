@@ -3,10 +3,11 @@ import {
   getGlobalLeaderboard,
   getHomeStats,
 } from "../controllers/leaderboard.controller.js";
-import { authMiddleware } from "../middleware/auth.middleware.js";
 const leaderboardRouter = express.Router();
 
-leaderboardRouter.get("/global", authMiddleware, getGlobalLeaderboard);
+import { checkAuth } from "../middlewares/auth.middleware.js";
+
+leaderboardRouter.get("/global", checkAuth, getGlobalLeaderboard);
 leaderboardRouter.get("/home-stats", getHomeStats);
 
 export default leaderboardRouter;

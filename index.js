@@ -14,8 +14,9 @@ const app = express();
 
 app.use(
   cors({
-    origin: "https://keystroq.vercel.app",
-    credentials: true,
+    // origin: ["https://keystroq.vercel.app", "http://localhost:3000"],
+    origin: "*",
+    // credentials: true,
   }),
 );
 
@@ -23,8 +24,9 @@ const httpServer = createServer(app);
 
 const io = new Server(httpServer, {
   cors: {
-    origin: "https://keystroq.vercel.app",
-    credentials: true,
+    // origin: ["https://keystroq.vercel.app", "http://localhost:3000"],
+    origin: "*",
+    // credentials: true,
   },
 });
 

@@ -5,9 +5,9 @@ export const getGlobalLeaderboard = async (req, res) => {
     const users = await prisma.user.findMany({
       select: {
         id: true,
-        name: true,
+        fullName: true,
         username: true,
-        photo: true,
+        imageUrl: true,
         playerWars: {
           select: {
             wpm: true,
@@ -34,9 +34,9 @@ export const getGlobalLeaderboard = async (req, res) => {
         return {
           player: {
             id: user.id,
-            name: user.name,
+            fullName: user.fullName,
             username: user.username,
-            photo: user.photo,
+            imageUrl: user.imageUrl,
           },
           bestWpm,
           avgWpm,

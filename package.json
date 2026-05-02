@@ -14,6 +14,8 @@
   "type": "module",
   "dependencies": {
     "@auth/core": "^0.34.3",
+    "@clerk/clerk-sdk-node": "^4.13.23",
+    "@clerk/express": "^2.1.10",
     "@prisma/adapter-pg": "^7.7.0",
     "@prisma/client": "^7.7.0",
     "bcrypt": "^6.0.0",
