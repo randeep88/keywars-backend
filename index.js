@@ -180,43 +180,6 @@ io.on("connection", (socket) => {
 
     if (!allFinished) return;
 
-    const winner = finishDataAll.reduce((best, current) => {
-      if (Number(current.progress) > Number(best.progress)) {
-        return current;
-      }
-
-      if (Number(current.progress) < Number(best.progress)) {
-        return best;
-      }
-      if (Number(current.wpm) > Number(best.wpm)) {
-        return current;
-      }
-
-      if (Number(current.wpm) < Number(best.wpm)) {
-        return best;
-      }
-
-      if (Number(current.accuracy) > Number(best.accuracy)) {
-        return current;
-      }
-
-      if (Number(current.accuracy) < Number(best.accuracy)) {
-        return best;
-      }
-
-      if (Number(current.error) < Number(best.error)) {
-        return current;
-      }
-
-      if (Number(current.error) > Number(best.error)) {
-        return best;
-      }
-
-      return Number(current.finishedAt) < Number(best.finishedAt)
-        ? current
-        : best;
-    });
-
     const war = await prisma.war.create({
       data: {
         roomId: data.roomId,
@@ -227,28 +190,25 @@ io.on("connection", (socket) => {
     });
 
     const rankedPlayers = [...finishDataAll]
+      .filter((d) => d && d.userId)
       .sort((a, b) => {
-        // 1. Progress
+        // 1. Progress (zyada better)
         if (Number(b.progress) !== Number(a.progress)) {
           return Number(b.progress) - Number(a.progress);
         }
-
-        // 2. WPM
+        // 2. WPM (zyada better)
         if (Number(b.wpm) !== Number(a.wpm)) {
           return Number(b.wpm) - Number(a.wpm);
         }
-
-        // 3. Accuracy
+        // 3. Accuracy (zyada better)
         if (Number(b.accuracy) !== Number(a.accuracy)) {
           return Number(b.accuracy) - Number(a.accuracy);
         }
-
-        // 4. Errors
+        // 4. Errors (kam better)
         if (Number(a.error) !== Number(b.error)) {
           return Number(a.error) - Number(b.error);
         }
-
-        // 5. FinishedAt
+        // 5. FinishedAt (pehle finish kiya better)
         return Number(a.finishedAt) - Number(b.finishedAt);
       })
       .map((player, index) => ({
@@ -256,6 +216,9 @@ io.on("connection", (socket) => {
         rank: index + 1,
         isWinner: index === 0,
       }));
+
+    // winner seedha rankedPlayers[0] se — alag reduce nahi
+    const winner = rankedPlayers[0];
 
     await prisma.playerWar.createMany({
       data: rankedPlayers.map((p) => ({
@@ -271,6 +234,7 @@ io.on("connection", (socket) => {
         isWinner: p.isWinner,
       })),
     });
+
     io.to(data.roomId).emit("notify:war", {
       action: "finish",
       winner: winner.userId,
