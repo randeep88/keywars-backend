@@ -166,7 +166,7 @@ io.on("connection", (socket) => {
       "progress",
       data.progress.toString(),
       "timeTaken",
-      data.timeTaken.toString(),
+      data.timeTaken,
     );
 
     const arena = await redis.hgetall(`war:${data.roomId}`);
