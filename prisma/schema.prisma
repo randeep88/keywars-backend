@@ -39,6 +39,7 @@ model PlayerWar {
   accuracy   Int
   error      Int
   progress   Int
+  timeTaken  Int
   finishedAt String
 
   createdAt DateTime @default(now())

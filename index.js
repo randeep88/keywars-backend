@@ -14,8 +14,8 @@ const app = express();
 
 app.use(
   cors({
-    origin: ["https://keystroq.vercel.app", "http://localhost:3000"],
-    // origin: "*",
+    origin: "https://keystroq.vercel.app",
+    // origin: "http://localhost:3000",
   }),
 );
 
@@ -23,8 +23,8 @@ const httpServer = createServer(app);
 
 const io = new Server(httpServer, {
   cors: {
-    origin: ["https://keystroq.vercel.app", "http://localhost:3000"],
-    // origin: "*",
+    origin: "https://keystroq.vercel.app",
+    // origin: "http://localhost:3000",
   },
 });
 
@@ -165,6 +165,8 @@ io.on("connection", (socket) => {
       data.error.toString(),
       "progress",
       data.progress.toString(),
+      "timeTaken",
+      data.timeTaken.toString(),
     );
 
     const arena = await redis.hgetall(`war:${data.roomId}`);
@@ -193,7 +195,7 @@ io.on("connection", (socket) => {
       const accuracy = Number(p.accuracy);
       const wpm = Number(p.wpm);
       const errors = Number(p.error);
-      const timeTaken = Number(p.finishedAt) - Number(arena.startedAt);
+      const timeTaken = Number(p.timeTaken);
       const effectiveWpm = wpm * (accuracy / 100);
       return { effectiveWpm, accuracy, errors, timeTaken };
     };
@@ -204,7 +206,7 @@ io.on("connection", (socket) => {
         const sa = getScore(a);
         const sb = getScore(b);
 
-        // 1. Effective WPM (wpm * accuracy) — main criteria
+        // 1. Effective WPM (wpm * accuracy)
         if (sb.effectiveWpm !== sa.effectiveWpm)
           return sb.effectiveWpm - sa.effectiveWpm;
 
@@ -234,6 +236,7 @@ io.on("connection", (socket) => {
         accuracy: parseInt(p.accuracy),
         error: parseInt(p.error),
         progress: parseInt(p.progress),
+        timeTaken: p.timeTaken,
         finishedAt: p.finishedAt,
         rank: p.rank,
         isWinner: p.isWinner,
