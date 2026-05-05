@@ -15,7 +15,7 @@ const app = express();
 app.use(
   cors({
     origin: "https://keystroq.vercel.app",
-    // origin: "http://localhost:3000",
+    // origin: "*",
   }),
 );
 
@@ -24,7 +24,7 @@ const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
     origin: "https://keystroq.vercel.app",
-    // origin: "http://localhost:3000",
+    // origin: "*",
   },
 });
 
@@ -166,7 +166,7 @@ io.on("connection", (socket) => {
       "progress",
       data.progress.toString(),
       "timeTaken",
-      data.timeTaken,
+      data.timeTaken.toString(),
     );
 
     const arena = await redis.hgetall(`war:${data.roomId}`);
@@ -217,7 +217,7 @@ io.on("connection", (socket) => {
         if (sa.errors !== sb.errors) return sa.errors - sb.errors;
 
         // 4. Time taken (kam better)
-        return sa.timeTaken - sb.timeTaken;
+        return Number(sa.timeTaken) - Number(sb.timeTaken);
       })
       .map((player, index) => ({
         ...player,
@@ -236,7 +236,7 @@ io.on("connection", (socket) => {
         accuracy: parseInt(p.accuracy),
         error: parseInt(p.error),
         progress: parseInt(p.progress),
-        timeTaken: p.timeTaken,
+        timeTaken: parseInt(p.timeTaken),
         finishedAt: p.finishedAt,
         rank: p.rank,
         isWinner: p.isWinner,

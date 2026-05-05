@@ -9,15 +9,15 @@ datasource db {
 
 model User {
   id         String      @id @default(cuid())
-  clerkId    String      @unique
-  fullName   String
-  firstName  String
-  lastName   String
   username   String      @unique
   email      String      @unique
-  imageUrl   String
   createdAt  String
   updatedAt  String
+  firstName  String
+  fullName   String
+  imageUrl   String
+  lastName   String
+  clerkId    String      @unique
   playerWars PlayerWar[]
 }
 
@@ -26,28 +26,25 @@ model War {
   roomId    String
   startedAt String
   status    String
-  players   PlayerWar[]
   passage   String
+  players   PlayerWar[]
 }
 
 model PlayerWar {
-  id         String @id @default(cuid())
-  warId      String
+  id         String   @id @default(cuid())
   userId     String
-  roomId     String
-  wpm        Int
+  warId      String
+  timeTaken  Int
+  finishedAt String
   accuracy   Int
   error      Int
   progress   Int
-  timeTaken  Int
-  finishedAt String
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
-
-  rank     Int?
-  isWinner Boolean @default(false)
-
-  war  War  @relation(fields: [warId], references: [id])
-  user User @relation(fields: [userId], references: [id])
+  roomId     String
+  wpm        Int
+  isWinner   Boolean  @default(false)
+  rank       Int?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
+  user       User     @relation(fields: [userId], references: [id])
+  war        War      @relation(fields: [warId], references: [id])
 }
